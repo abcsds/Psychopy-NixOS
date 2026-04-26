@@ -110,6 +110,19 @@ pkgs.buildFHSEnv {
     export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
     export NIX_SSL_CERT_FILE=$SSL_CERT_FILE
 
+    # Plasma (and GNOME) set GTK_MODULES / GTK_PATH pointing at
+    # /run/current-system/sw/lib/gtk-3.0/modules so e.g. appmenu-gtk-module
+    # and colorreload-gtk-module load globally. Those .so's are linked
+    # against the host's GTK, NOT the GTK we ship in this FHS env, so they
+    # surface as `undefined symbol: gtk_module_display_init` and (on a
+    # live Wayland session) prevent the wxPython app from realising any
+    # window. Clear them so GTK falls back to the FHS env's own modules.
+    unset GTK_MODULES GTK3_MODULES GTK_PATH GTK3_PATH GTK_IM_MODULE_FILE
+
+    # Same reasoning for QT plugin paths — we don't use Qt here, but
+    # wxPython links libsoup/webkit which transitively peek at these.
+    unset QT_PLUGIN_PATH QML2_IMPORT_PATH
+
     # Keep the venv discoverable to the launcher.
     : "''${PSYCHOPY_FLAKE_REQS:=missing}"
   '';

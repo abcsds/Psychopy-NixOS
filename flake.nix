@@ -6,84 +6,55 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs =
+    { self, nixpkgs, flake-utils }:
     {
+      # NixOS module: enables `programs.psychopy.enable` system-wide.
+      # When toggled on, installs the bundled `psychopy` package (binary +
+      # .desktop entries + icons) and adds the rtprio/memlock PAM limits +
+      # the `psychopy` group used by PTB for low-latency timing.
       nixosModules.psychopy = import ./nix/module.nix;
     }
-    // flake-utils.lib.eachDefaultSystem (system:
+    // flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
-        reqs = ./requirements.txt;
-        reqsHash = builtins.substring 0 12
-          (builtins.hashFile "sha256" reqs);
-
-        srcDir = ./src;
-
-        launcher = import ./nix/launcher.nix {
-          inherit pkgs reqs reqsHash srcDir;
-        };
-
-        psychopyFhs = import ./nix/fhs.nix {
-          inherit pkgs;
-          runScript = "${launcher}";
-        };
-
-        # Per-subcommand wrapper. The visible binary name shows up in
-        # `ps`, error messages, and shells — keep it user-friendly.
-        mkApp = subcmd: binName:
-          pkgs.writeShellScriptBin binName ''
-            exec ${psychopyFhs}/bin/psychopy-fhs ${subcmd} "$@"
-          '';
-
-        defaultBin = mkApp "default" "psychopy";
-        builderBin = mkApp "builder" "psychopy-builder";
-        coderBin = mkApp "coder" "psychopy-coder";
-        runBin = mkApp "run" "psychopy-run";
-        hwBin = mkApp "hardware-report" "psychopy-hardware-report";
-        smoketestBin = mkApp "smoketest" "psychopy-smoketest";
-        shellBin = mkApp "shell" "psychopy-shell";
-
+        psychopyApp = pkgs.callPackage ./nix/psychopy-app.nix { };
       in
       {
         packages = {
-          default = defaultBin;
-          psychopy = defaultBin;
-          psychopy-builder = builderBin;
-          psychopy-coder = coderBin;
-          psychopy-run = runBin;
-          hardware-report = hwBin;
-          fhs = psychopyFhs;
+          default = psychopyApp;
+          psychopy = psychopyApp;
+          fhs = psychopyApp.passthru.fhs;
         };
 
         apps =
           let
-            mkAppOut = bin: progName: desc: {
+            mkApp = bin: desc: {
               type = "app";
-              program = "${bin}/bin/${progName}";
+              program = "${psychopyApp}/bin/${bin}";
               meta.description = desc;
             };
           in
           {
-            default = mkAppOut defaultBin "psychopy" "PsychoPy starter app picker";
-            builder = mkAppOut builderBin "psychopy-builder" "PsychoPy Builder";
-            coder = mkAppOut coderBin "psychopy-coder" "PsychoPy Coder";
-            run = mkAppOut runBin "psychopy-run" "Run a .psyexp / .py experiment";
-            hardware-report = mkAppOut hwBin "psychopy-hardware-report"
-              "Generate hardware-capability HTML report for this device";
-            # Run manually: `nix run .#smoketest`
-            # (Not wired into `nix flake check` — first-run venv install
-            # needs network, which the build sandbox doesn't have.)
-            smoketest = mkAppOut smoketestBin "psychopy-smoketest"
+            default = mkApp "psychopy" "PsychoPy starter app picker";
+            builder = mkApp "psychopy-builder" "PsychoPy Builder";
+            coder = mkApp "psychopy-coder" "PsychoPy Coder";
+            run = mkApp "psychopy-run" "Run a .psyexp / .py experiment headlessly";
+            hardware-report = mkApp "psychopy-hardware-report"
+              "Generate a hardware-capability HTML report for this device";
+            # Manual sanity check; not in `nix flake check` because the
+            # first-run venv install needs network.
+            smoketest = mkApp "psychopy-smoketest"
               "Import psychopy/wx/pylsl and print versions";
-            # Bash shell inside the FHS env with the venv on PATH.
-            # Useful for debugging "ImportError: lib*.so" issues.
-            shell = mkAppOut shellBin "psychopy-shell"
+            # Bash inside the FHS env with the venv on PATH.
+            shell = mkApp "psychopy-shell"
               "Diagnostic bash inside the PsychoPy FHS env";
           };
 
         devShells.default = pkgs.mkShell {
-          packages = [ defaultBin builderBin coderBin runBin hwBin ];
+          packages = [ psychopyApp ];
           shellHook = ''
             cat <<'EOF'
             ═══════════════════════════════════════════════════════════════
@@ -94,11 +65,13 @@
               psychopy-coder   [file]   open Coder
               psychopy-run     <file>   run an experiment
               psychopy-hardware-report  generate hardware HTML
+              psychopy-shell            FHS diagnostic shell
             ═══════════════════════════════════════════════════════════════
             EOF
           '';
         };
 
         formatter = pkgs.nixfmt;
-      });
+      }
+    );
 }
