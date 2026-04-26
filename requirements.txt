@@ -1,0 +1,10 @@
+# PsychoPy fleet runner — pinned for reliability
+# Requires Python >=3.9 and <3.12 (we use 3.11)
+
+psychopy==2026.1.3
+pylsl>=1.17.6
+bokeh>=3.0.0
+psutil>=5.9.0
+scipy>=1.9.0
+# Note: setuptools/pip/wheel are upgraded inside the launcher before
+# resolving the rest, so no pin is needed here.

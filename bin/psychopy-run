@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Non-nix fallback. Runs an experiment from a venv at
+# $XDG_STATE_HOME/psychopy-flake-fallback/venv (created by the user).
+#
+# On NixOS, prefer `nix run .#run -- file.psyexp` from the flake instead.
+
+set -euo pipefail
+
+if [ $# -lt 1 ]; then
+    echo "usage: $0 <experiment.py|experiment.psyexp>" >&2
+    exit 64
+fi
+
+VENV="${XDG_STATE_HOME:-$HOME/.local/state}/psychopy-flake-fallback/venv"
+if [ ! -x "$VENV/bin/python" ]; then
+    echo "No fallback venv at $VENV." >&2
+    echo "Either use the flake (\`nix run .#run -- $1\`) or create the venv:" >&2
+    echo "  python3.11 -m venv $VENV" >&2
+    echo "  $VENV/bin/pip install -r $(dirname "$0")/../requirements.txt" >&2
+    exit 1
+fi
+
+export PYTHONWARNINGS="ignore::RuntimeWarning"
+
+if [[ "$1" == *.py ]]; then
+    exec "$VENV/bin/python" "$@"
+else
+    exec "$VENV/bin/python" -c "
+import sys
+sys.argv = ['psychopy', 'run'] + sys.argv[1:]
+from psychopy.app.psychopyApp import main
+sys.exit(main())
+" "$@"
+fi

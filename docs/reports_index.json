@@ -1,0 +1,13 @@
+[
+  {
+    "hostname": "Saturn",
+    "platform": "Linux",
+    "architecture": "x86_64",
+    "timestamp": "2026-04-26_22-01-44",
+    "filename": "hardware_Saturn_2026-04-26_22-01-44.html",
+    "status": "ready",
+    "status_text": "\u2713 Ready",
+    "psychopy_available": true,
+    "pylsl_available": true
+  }
+]

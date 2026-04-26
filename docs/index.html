@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardware Reports Index</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .search-box {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #searchInput:focus {
+            border-color: #667eea;
+        }
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .report-card {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .device-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .timestamp {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .platform {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 5px 5px 5px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin: 5px 5px 5px 0;
+        }
+        .status-ready {
+            background: #2ecc71;
+            color: white;
+        }
+        .status-partial {
+            background: #f39c12;
+            color: white;
+        }
+        .status-not-ready {
+            background: #e74c3c;
+            color: white;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            flex: 1;
+            min-width: 150px;
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Hardware Reports Index</h1>
+        <p style="color: #7f8c8d; margin-bottom: 20px;">PsychoPy Environment Testing Reports</p>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalReports">1</div>
+                <div class="stat-label">Total Reports</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="uniqueDevices">1</div>
+                <div class="stat-label">Unique Devices</div>
+            </div>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Search by device name, platform, or date..." onkeyup="filterReports()">
+        </div>
+        
+        <div class="reports-grid" id="reportsGrid">
+            
+            <div class="report-card" onclick="window.location.href='hardware_Saturn_2026-04-26_22-01-44.html'" 
+                 data-hostname="Saturn" 
+                 data-platform="Linux" 
+                 data-timestamp="2026-04-26_22-01-44">
+                <div class="device-name">Saturn</div>
+                <div class="timestamp">2026-04-26_22-01-44</div>
+                <div>
+                    <span class="platform">Linux x86_64</span>
+                    <span class="status-badge status-ready">✓ Ready</span>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div id="noResults" class="no-results" style="display: none;">
+            No reports found matching your search.
+        </div>
+    </div>
+    
+    <script>
+        function filterReports() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.report-card');
+            let visibleCount = 0;
+            
+            cards.forEach(card => {
+                const hostname = (card.dataset.hostname || '').toLowerCase();
+                const platform = (card.dataset.platform || '').toLowerCase();
+                const timestamp = (card.dataset.timestamp || '').toLowerCase();
+                const matches = hostname.includes(searchTerm) || 
+                               platform.includes(searchTerm) || 
+                               timestamp.includes(searchTerm);
+                
+                card.style.display = matches ? 'block' : 'none';
+                if (matches) visibleCount++;
+            });
+            
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+            document.getElementById('reportsGrid').style.display = visibleCount === 0 ? 'none' : 'grid';
+        }
+    </script>
+</body>
+</html>
