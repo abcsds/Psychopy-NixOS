@@ -139,7 +139,7 @@ stdenvNoCC.mkDerivation {
   };
 
   meta = {
-    description = "PsychoPy fleet runner — reliable nix-managed launcher (PsychoPy 2026.1.3)";
+    description = "PsychoPy on NixOS — reliable nix-managed launcher (PsychoPy 2026.1.3)";
     homepage = "https://github.com/abcsds/Psychopy-NixOS";
     license = lib.licenses.gpl3Plus;
     platforms = lib.platforms.linux;

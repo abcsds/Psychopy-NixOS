@@ -1,5 +1,5 @@
 {
-  description = "PsychoPy fleet runner — reliable nix-managed launcher for the Wanderers";
+  description = "PsychoPy on NixOS — reliable nix-managed launcher";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -58,7 +58,7 @@
           shellHook = ''
             cat <<'EOF'
             ═══════════════════════════════════════════════════════════════
-             PsychoPy fleet runner — devShell
+             PsychoPy on NixOS — devShell
             ═══════════════════════════════════════════════════════════════
               psychopy                  starter app picker
               psychopy-builder [file]   open Builder

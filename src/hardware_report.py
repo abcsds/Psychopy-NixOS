@@ -1360,7 +1360,7 @@ if __name__ == "__main__":
     # Output dir resolution:
     #   1. $PSYCHOPY_REPORT_DIR if set (explicit override)
     #   2. $PWD/docs if invoked from a writable project root
-    #   3. $XDG_DATA_HOME/psychopy-flake/reports/ as a fleet-wide fallback
+    #   3. $XDG_DATA_HOME/psychopy-flake/reports/ as a per-user fallback
     # When invoked via `nix run`, the script lives in /nix/store (read-only),
     # so the legacy `script_dir.parent / "docs"` is never appropriate.
     env_override = os.environ.get("PSYCHOPY_REPORT_DIR")

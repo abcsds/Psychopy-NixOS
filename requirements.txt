@@ -1,4 +1,4 @@
-# PsychoPy fleet runner — pinned for reliability
+# PsychoPy on NixOS — pinned for reliability
 # Requires Python >=3.9 and <3.12 (we use 3.11)
 
 psychopy==2026.1.3

@@ -6,7 +6,7 @@ let
 in
 {
   options.programs.psychopy = {
-    enable = lib.mkEnableOption "the PsychoPy fleet runner (binary + .desktop + timing-priority limits)";
+    enable = lib.mkEnableOption "the PsychoPy launcher (binary + .desktop + timing-priority limits)";
 
     package = lib.mkOption {
       type = lib.types.package;
