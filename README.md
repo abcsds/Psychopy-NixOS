@@ -3,7 +3,7 @@
 A flake-first launcher that makes PsychoPy run reliably on any NixOS host.
 
 ```
-nix run github:abcsds/psychopy#default
+nix run github:abcsds/Psychopy-NixOS#default
 ```
 
 The first invocation builds an FHS sandbox with all the system libraries
@@ -41,7 +41,7 @@ sets `nice=-20`, `rtprio=50`, `memlock=unlimited` for members of the
 …and add the input to your flake:
 
 ```nix
-inputs.psychopy.url = "github:abcsds/psychopy";
+inputs.psychopy.url = "github:abcsds/Psychopy-NixOS";
 ```
 
 ## Design
